@@ -1,9 +1,36 @@
 {% extends "base.html" %}
-{% block title %}{% endblock %}
-{% block header %}{% endblock %}
+{% block title %}{{ header }}{% endblock %}
+{% block header %}{{ header }}{% endblock %}
 {% block content %}
 
 
   <div class="container">
+    {% if user.is_authenticated %}
+    <table class="table">
+        <thead>
+            <tr>
+              <th scope="col">Название</th>
+              <th scope="col">Сумма</th>
+              <th scope="col">Дата создания</th>
+              <th scope="col">Страница счета</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for account in accounts %}
+              <td>{{ account.name }}</td>
+              <td>{{ account.amount }}</td>
+              <td>{{ account.pub_date }}</td>
+              <td><a href="{% url 'account_detail' account.pk %}">Подробнее о счете</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        
+    </table>
+    {% else %}
+    <div class="mx-auto" style="width: 1000px;">
+        Вы не авторизованы. Пожалуйста, авторизуйтесь, чтобы увидеть доступные счета или создать новый счет.
+    </div>
+    
+    {% endif %}
   </div>
 {% endblock %}
