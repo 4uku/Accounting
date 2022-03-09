@@ -5,6 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import BankAccount
 from .forms import CreationForm, AccountForm
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 
 class SignUp(CreateView):
@@ -39,7 +43,15 @@ def add_bank_acc(request):
         new_acc.holder = request.user
         new_acc.save()
         return redirect('index')
-    return render(request, 'add_acc.html', {'form': form, 'header': header, 'button': button})
+    return render(
+        request,
+        'add_acc.html',
+        {
+            'form': form,
+            'header': header,
+            'button': button
+        }
+    )
 
 
 @login_required
@@ -50,8 +62,22 @@ def account_detail(request, pk):
     return render(
         request,
         'account_detail.html',
-        {'account': account,
-        'header': header
+        {
+            'account': account,
+            'header': header
         }
 
+    )
+
+
+@login_required
+@csrf_exempt
+def transaction(request):
+    return render(
+        request,
+        'transaction.html',
+        {
+            'accounts': request.user.accounts.all(),
+            'users': User.objects.all().exclude(username=request.user.username)
+        }
     )

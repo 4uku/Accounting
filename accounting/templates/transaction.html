@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}{{ header }}{% endblock %}
+{% block header %}{{ header }}{% endblock %}
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+                <label for="exampleFormControlSelect2">Выберете один или несколько счетов для выполнения перевода</label>
+                <select multiple class="form-control" id="exampleFormControlSelect2">
+                  {% for account in accounts %}
+                    <option>Название счета: {{ account.name }} | Сумма: {{ account.amount }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+        </div>
+        <div class="col-lg-6 col-md-6">
+            <div class="form-group">
+                <label for="exampleFormControlSelect1">Выберите пользователя, которому хотите сделать перевод</label>
+                <select class="form-control" id="exampleFormControlSelect1">
+                  <option>---</option>
+                  {% for user in users %}
+                    <option>{{ user.username }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+        </div>
+    </div>
+    <br>
+    <a class="btn btn-sm btn-primary" href="{% url 'index' %}" role="button">
+        Выполнить перевод
+        </a>
+</div>
+
+{% endblock %}
