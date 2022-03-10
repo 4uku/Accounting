@@ -7,4 +7,29 @@
 <b>Сумма на счете:</b> {{account.amount}}<br>
 <b>Дата создания:</b> {{account.pub_date}}<br>
 
+<b>История операций текущего счета:</b>
+<br>
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+              <th scope="col">От кого</th>
+              <th scope="col">Кому</th>
+              <th scope="col">Сумма</th>
+              <th scope="col">Дата</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for write_off in write_offs %}
+              <td>{{ write_off.from_acc }}</td>  
+              <td>{{ write_off.to_acc }}</td>
+              <td>{{ write_off.amount }}</td>
+              <td>{{ write_off.date }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        
+    </table>
+  </div>
+
 {% endblock %}

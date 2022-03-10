@@ -1,8 +1,8 @@
+from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
-from django import forms
-from .models import BankAccount
 
+from .models import BankAccount
 
 User = get_user_model()
 
@@ -36,9 +36,12 @@ class TransactionForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop('sender', None)
         super(TransactionForm, self).__init__(*args, **kwargs)
-        self.fields['account_for_send'].queryset = self.user.accounts.all()
-        self.fields['account_for_receive'].queryset = BankAccount.objects.all().exclude(holder=self.user)
+        self.fields['from_acc'].queryset = self.user.accounts.all()
+        self.fields['to_acc'].queryset = \
+            BankAccount.objects.all().exclude(holder=self.user)
 
-    account_for_send = forms.ModelChoiceField(queryset=None, label='Счет для перевода')
-    account_for_receive = forms.ModelChoiceField(queryset=None, label='Счет получателя')
+    from_acc = forms.ModelChoiceField(
+        queryset=None, label='Счет для перевода')
+    to_acc = forms.ModelChoiceField(
+        queryset=None, label='Счет получателя')
     amount = forms.IntegerField(label='Сумма')

@@ -1,12 +1,13 @@
-from django.views.generic import CreateView
-from django.urls import reverse_lazy
-from django.shortcuts import redirect, render
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.csrf import csrf_exempt
-from .models import BankAccount
-from .forms import CreationForm, AccountForm, TransactionForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required
+from django.db.models import Q
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy
+from django.views.decorators.csrf import csrf_exempt
+from django.views.generic import CreateView
 
+from .forms import AccountForm, CreationForm, TransactionForm
+from .models import BankAccount, Transaction
 
 User = get_user_model()
 
@@ -57,14 +58,17 @@ def add_bank_acc(request):
 @login_required
 @csrf_exempt
 def account_detail(request, pk):
-    account = BankAccount.objects.get(pk=pk)
+    account = get_object_or_404(BankAccount, pk=pk)
     header = f'Информация о счете "{account.name}"'
+    write_offs = Transaction.objects.filter(
+        Q(from_acc=account) | Q(to_acc=account))
     return render(
         request,
         'account_detail.html',
         {
             'account': account,
-            'header': header
+            'header': header,
+            'write_offs': write_offs
         }
 
     )
@@ -92,11 +96,12 @@ def transaction(request):
         }
     )
 
+
 @login_required
 @csrf_exempt
 def send_money(request):
-    sender_id = int(request.POST.get('account_for_send'))
-    receiver_id = int(request.POST.get('account_for_receive'))
+    sender_id = int(request.POST.get('from_acc'))
+    receiver_id = int(request.POST.get('to_acc'))
     amount = int(request.POST.get('amount'))
     sender_acc = BankAccount.objects.get(pk=sender_id)
     receiver_acc = BankAccount.objects.get(pk=receiver_id)
@@ -104,7 +109,10 @@ def send_money(request):
     receiver_acc.amount += amount
     sender_acc.save()
     receiver_acc.save()
-    
+    Transaction.objects.get_or_create(
+        from_acc=sender_acc,
+        to_acc=receiver_acc,
+        amount=amount)
     return render(
         request,
         'succesful.html',
