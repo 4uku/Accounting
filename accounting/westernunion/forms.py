@@ -30,3 +30,15 @@ class AccountForm(forms.ModelForm):
             'name': 'Введите название счета',
             'amount': 'Введите сумму на счете'
         }
+
+
+class TransactionForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('sender', None)
+        super(TransactionForm, self).__init__(*args, **kwargs)
+        self.fields['account_for_send'].queryset = self.user.accounts.all()
+        self.fields['account_for_receive'].queryset = BankAccount.objects.all().exclude(holder=self.user)
+
+    account_for_send = forms.ModelChoiceField(queryset=None, label='Счет для перевода')
+    account_for_receive = forms.ModelChoiceField(queryset=None, label='Счет получателя')
+    amount = forms.IntegerField(label='Сумма')

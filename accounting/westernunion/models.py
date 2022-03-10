@@ -1,6 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
 from django.contrib.auth import get_user_model
+from django.dispatch import receiver
 
 User = get_user_model()
 
@@ -19,3 +19,12 @@ class BankAccount(models.Model):
             models.UniqueConstraint(fields=['holder', 'name'],
                                     name='uniq_acc'),
         )
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Transaction(models.Model):
+    from_acc = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, related_name='sending')
+    to_acc = models.ForeignKey(BankAccount, on_delete=models.SET_NULL, related_name='receiping')
+    amount = models.PositiveIntegerField()

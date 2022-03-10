@@ -4,7 +4,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from .models import BankAccount
-from .forms import CreationForm, AccountForm
+from .forms import CreationForm, AccountForm, TransactionForm
 from django.contrib.auth import get_user_model
 
 
@@ -73,11 +73,43 @@ def account_detail(request, pk):
 @login_required
 @csrf_exempt
 def transaction(request):
+    header = 'Выполнить перевод'
+    button = 'Отправить'
+    accounts = request.user.accounts.all()
+    users = User.objects.all().exclude(username=request.user.username)
+    form = TransactionForm(request.POST or None, sender=request.user)
+    if form.is_valid():
+        return redirect('index')
     return render(
         request,
         'transaction.html',
         {
-            'accounts': request.user.accounts.all(),
-            'users': User.objects.all().exclude(username=request.user.username)
+            'header': header,
+            'button': button,
+            'form': form,
+            'accounts': accounts,
+            'users': users
+        }
+    )
+
+@login_required
+@csrf_exempt
+def send_money(request):
+    sender_id = int(request.POST.get('account_for_send'))
+    receiver_id = int(request.POST.get('account_for_receive'))
+    amount = int(request.POST.get('amount'))
+    sender_acc = BankAccount.objects.get(pk=sender_id)
+    receiver_acc = BankAccount.objects.get(pk=receiver_id)
+    sender_acc.amount -= amount
+    receiver_acc.amount += amount
+    sender_acc.save()
+    receiver_acc.save()
+    
+    return render(
+        request,
+        'succesful.html',
+        {
+            'amount': amount,
+            'receiver_acc': receiver_acc
         }
     )

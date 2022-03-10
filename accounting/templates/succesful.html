@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}{{ header }}{% endblock %}
+{% block header %}{{ header }}{% endblock %}
+{% block content %}
+
+Вы успешно перевели {{ amount }} на счет "{{ receiver_acc.name }}" пользователя "{{ receiver_acc.holder.username }}"
+
+{% endblock %}

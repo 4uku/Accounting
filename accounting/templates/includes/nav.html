@@ -3,6 +3,7 @@
     <nav class="my-2 my-md-0 mr-md-3">
       {% if user.is_authenticated %}
         Пользователь: {{ user.username }}.
+        <a class="p-2 text-dark" href="{% url 'index' %}">Мои счета</a>
         <a class="p-2 text-dark" href="{% url 'add_acc' %}">Добавить счет</a>
         <a class="p-2 text-dark" href="{% url 'transaction' %}">Выполнить перевод</a>
         <a class="p-2 text-dark" href="{% url 'logout' %}">Выйти</a>
